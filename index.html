@@ -1,625 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#080b14" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Evolve" />
-  <meta name="description" content="1% Better Every Day — your personal growth tracker" />
-  <title>Evolve Tracker</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/080b14/06d6a0?text=E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
-
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:        #080b14;
-      --surface:   rgba(255,255,255,0.03);
-      --border:    rgba(255,255,255,0.07);
-      --text:      #e8eaf0;
-      --muted:     rgba(255,255,255,0.35);
-      --subtle:    rgba(255,255,255,0.05);
-
-      --fit-c:   #ff6b6b; --fit-g: rgba(255,107,107,0.25); --fit-bg: rgba(255,107,107,0.07);
-      --men-c:   #b06bff; --men-g: rgba(176,107,255,0.25); --men-bg: rgba(176,107,255,0.07);
-      --soc-c:   #ffd166; --soc-g: rgba(255,209,102,0.25); --soc-bg: rgba(255,209,102,0.07);
-      --ski-c:   #06d6a0; --ski-g: rgba(6,214,160,0.25);   --ski-bg: rgba(6,214,160,0.07);
-    }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    /* ── BACKGROUND ATMOSPHERE ── */
-    body::before, body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-    }
-    body::before {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(176,107,255,.14) 0%, transparent 70%);
-      top: -120px; right: -100px;
-    }
-    body::after {
-      width: 320px; height: 320px;
-      background: radial-gradient(circle, rgba(6,214,160,.1) 0%, transparent 70%);
-      bottom: 80px; left: -80px;
-    }
-
-    /* ── LAYOUT ── */
-    #app {
-      max-width: 430px;
-      margin: 0 auto;
-      padding: 0 0 80px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      padding: 56px 24px 20px;
-    }
-    .header-date {
-      font-size: 11px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .header-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1.05;
-      background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,.5));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .header-sub {
-      margin-top: 5px;
-      font-size: 13px;
-      color: var(--muted);
-      letter-spacing: .04em;
-    }
-
-    /* ── PROGRESS CARD ── */
-    .progress-card {
-      margin: 0 14px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 22px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-    }
-    .ring-wrap { position: relative; flex-shrink: 0; width: 120px; height: 120px; }
-    #progress-svg { width: 120px; height: 120px; transform: rotate(-90deg); }
-    .ring-track {
-      fill: none;
-      stroke: rgba(255,255,255,.06);
-      stroke-width: 9;
-    }
-    .ring-fill {
-      fill: none;
-      stroke: url(#ringGrad);
-      stroke-width: 9;
-      stroke-linecap: round;
-      transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);
-    }
-    .ring-center {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-    #pct-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 26px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #06d6a0, #b06bff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-    }
-    .pct-label { font-size: 10px; color: var(--muted); letter-spacing: .08em; margin-top: 2px; }
-    .progress-info { flex: 1; min-width: 0; }
-    .progress-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-    #progress-msg { font-size: 12.5px; color: rgba(255,255,255,.4); line-height: 1.5; }
-    .progress-count { margin-top: 10px; font-size: 13px; color: rgba(255,255,255,.4); }
-    #done-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: #06d6a0; }
-    #total-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
-
-    /* ── CATEGORY CARDS ── */
-    .cat-card {
-      margin: 0 14px 13px;
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 22px;
-      overflow: hidden;
-      transition: transform .15s;
-    }
-    .cat-card:active { transform: scale(.99); }
-
-    .cat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 20px 14px;
-    }
-    .cat-left { display: flex; align-items: center; gap: 10px; }
-    .cat-emoji { font-size: 20px; line-height: 1; }
-    .cat-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 15.5px;
-      font-weight: 700;
-    }
-    .cat-badge {
-      font-size: 11px;
-      padding: 2px 9px;
-      border-radius: 20px;
-      font-weight: 600;
-      display: none;
-    }
-    .add-btn {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      font-size: 22px;
-      font-weight: 300;
-      line-height: 1;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform .2s, box-shadow .2s;
-      flex-shrink: 0;
-      color: inherit;
-    }
-    .add-btn:hover { transform: scale(1.1); }
-    .add-btn:active { transform: scale(.93); }
-    .add-btn.open { font-size: 26px; }
-
-    /* ── GOALS LIST ── */
-    .goals-list { padding: 0 20px 4px; }
-    .goal-item {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 10px 0;
-      border-top: 1px solid rgba(255,255,255,.05);
-      animation: slideIn .22s ease;
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .check-btn {
-      width: 23px; height: 23px;
-      border-radius: 50%;
-      border: 2px solid;
-      cursor: pointer;
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      transition: all .2s;
-      background: transparent;
-      color: transparent;
-    }
-    .check-btn.checked { color: #080b14; }
-    .goal-text {
-      flex: 1;
-      font-size: 13.5px;
-      line-height: 1.4;
-      transition: opacity .2s;
-      word-break: break-word;
-    }
-    .goal-text.done {
-      text-decoration: line-through;
-      opacity: .35;
-    }
-    .del-btn {
-      width: 27px; height: 27px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.3);
-      font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all .2s;
-      flex-shrink: 0;
-    }
-    .del-btn:hover { background: rgba(255,80,80,.14); color: #ff6b6b; }
-
-    /* ── ADD INPUT ROW ── */
-    .add-row {
-      display: flex;
-      gap: 8px;
-      padding: 8px 18px 16px;
-      animation: slideIn .2s ease;
-    }
-    .add-input {
-      flex: 1;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 13px;
-      padding: 10px 14px;
-      font-size: 14px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      transition: border-color .2s;
-    }
-    .add-input::placeholder { color: rgba(255,255,255,.22); }
-    .add-input:focus { border-color: rgba(255,255,255,.24); }
-    .confirm-btn {
-      padding: 10px 18px;
-      border-radius: 13px;
-      border: none;
-      cursor: pointer;
-      font-family: 'Syne', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      color: #080b14;
-      transition: all .2s;
-      white-space: nowrap;
-    }
-    .confirm-btn:hover { transform: scale(1.04); }
-    .confirm-btn:active { transform: scale(.96); }
-
-    /* ── RESET ── */
-    .reset-wrap { text-align: center; margin-top: 26px; }
-    .reset-btn {
-      background: transparent;
-      border: 1px solid rgba(255,80,80,.22);
-      border-radius: 14px;
-      color: rgba(255,107,107,.55);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12.5px;
-      letter-spacing: .04em;
-      padding: 11px 26px;
-      transition: all .2s;
-    }
-    .reset-btn:hover { background: rgba(255,80,80,.08); color: #ff6b6b; border-color: rgba(255,107,107,.5); }
-
-    /* ── PWA INSTALL BANNER ── */
-    #install-bar {
-      display: none;
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20,22,32,.95);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 16px;
-      padding: 12px 18px;
-      font-size: 13px;
-      color: var(--text);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      z-index: 100;
-      gap: 14px;
-      align-items: center;
-      max-width: 360px;
-      width: calc(100% - 32px);
-      box-shadow: 0 8px 32px rgba(0,0,0,.5);
-      animation: slideIn .3s ease;
-    }
-    #install-bar.visible { display: flex; }
-    #install-bar span { flex: 1; line-height: 1.4; }
-    #install-bar strong { font-family: 'Syne', sans-serif; color: #06d6a0; }
-    #install-ok {
-      background: linear-gradient(135deg, #06d6a0, #b06bff);
-      color: #080b14;
-      border: none;
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-family: 'Syne', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: transform .2s;
-    }
-    #install-ok:hover { transform: scale(1.05); }
-    #install-dismiss {
-      background: none; border: none; color: var(--muted);
-      cursor: pointer; font-size: 18px; line-height: 1; padding: 4px;
-    }
-  </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>evolve</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <!-- Link to your new CSS file -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div id="app">
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-date" id="header-date"></div>
-    <div class="header-title">Evolve<br>Tracker</div>
-    <div class="header-sub">1% Better Every Day</div>
-  </div>
+  <div class="blob1"></div>
+  <div class="blob2"></div>
 
-  <!-- PROGRESS CARD -->
-  <div class="progress-card">
-    <div class="ring-wrap">
-      <svg id="progress-svg" viewBox="0 0 120 120">
-        <defs>
-          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#06d6a0"/>
-            <stop offset="100%" stop-color="#b06bff"/>
-          </linearGradient>
-        </defs>
-        <circle class="ring-track" cx="60" cy="60" r="50"/>
-        <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50"
-          stroke-dasharray="314.16"
-          stroke-dashoffset="314.16"/>
-      </svg>
-      <div class="ring-center">
-        <span id="pct-num">0%</span>
-        <span class="pct-label">done</span>
-      </div>
-    </div>
-    <div class="progress-info">
-      <div class="progress-title">Daily Progress</div>
-      <div id="progress-msg">Start checking off your goals!</div>
-      <div class="progress-count">
-        <span id="done-num">0</span>
-        <span id="total-num"> / 0</span>
-        <span style="color:rgba(255,255,255,.35)"> goals</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- CATEGORY CARDS (rendered by JS) -->
-  <div id="cats"></div>
-
-  <div class="reset-wrap">
-    <button class="reset-btn" onclick="resetApp()">⚠ Factory Reset</button>
-  </div>
-</div>
-
-<!-- PWA INSTALL BANNER -->
-<div id="install-bar">
-  <span>Add <strong>Evolve</strong> to your home screen for the best experience!</span>
-  <button id="install-ok">Install</button>
-  <button id="install-dismiss">×</button>
-</div>
-
-<script>
-// ─── DATA ─────────────────────────────────────────────────────────────────────
-const CATS = [
-  { id:'fitness', label:'Fitness',       emoji:'💪', color:'#ff6b6b', glow:'rgba(255,107,107,.28)', bg:'rgba(255,107,107,.07)' },
-  { id:'mental',  label:'Mental Growth', emoji:'🧠', color:'#b06bff', glow:'rgba(176,107,255,.28)', bg:'rgba(176,107,255,.07)' },
-  { id:'social',  label:'Social Growth', emoji:'🤝', color:'#ffd166', glow:'rgba(255,209,102,.28)', bg:'rgba(255,209,102,.07)' },
-  { id:'skills',  label:'Skills',        emoji:'🚀', color:'#06d6a0', glow:'rgba(6,214,160,.28)',   bg:'rgba(6,214,160,.07)'   },
-];
-
-let state = { fitness:[], mental:[], social:[], skills:[] };
-let openInput = null; // which cat has input open
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem('evolve_goals_v2');
-    if (raw) state = JSON.parse(raw);
-  } catch(_) {}
-}
-function saveState() {
-  try { localStorage.setItem('evolve_goals_v2', JSON.stringify(state)); } catch(_) {}
-}
-
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-
-function allGoals() { return Object.values(state).flat(); }
-function doneGoals() { return allGoals().filter(g => g.done); }
-
-// ─── PROGRESS ─────────────────────────────────────────────────────────────────
-function updateProgress() {
-  const total = allGoals().length;
-  const done  = doneGoals().length;
-  const pct   = total === 0 ? 0 : Math.round((done / total) * 100);
-  const circ  = 2 * Math.PI * 50; // 314.16
-
-  document.getElementById('pct-num').textContent  = pct + '%';
-  document.getElementById('done-num').textContent = done;
-  document.getElementById('total-num').textContent = ' / ' + total;
-
-  const fill   = document.getElementById('ring-fill');
-  const offset = circ - (pct / 100) * circ;
-  fill.style.strokeDashoffset = offset;
-
-  const msgs = [
-    'Start checking off your goals!',
-    "You've started — keep going!",
-    "Nice momentum, keep it up 💪",
-    "Halfway there, don't stop now!",
-    "So close! Finish strong 🔥",
-    "You crushed it today! 🏆"
-  ];
-  const idx = pct === 0 ? 0 : pct === 100 ? 5 : Math.min(4, Math.floor(pct / 25) + 1);
-  document.getElementById('progress-msg').textContent = msgs[idx];
-}
-
-// ─── RENDER CATEGORIES ────────────────────────────────────────────────────────
-function render() {
-  const container = document.getElementById('cats');
-  container.innerHTML = '';
-
-  CATS.forEach(cat => {
-    const goals    = state[cat.id] || [];
-    const catDone  = goals.filter(g => g.done).length;
-    const isOpen   = openInput === cat.id;
-
-    const card = document.createElement('div');
-    card.className = 'cat-card';
-    card.id = 'cat-' + cat.id;
-    card.style.background = cat.bg;
-
-    // Badge
-    const badgeHTML = goals.length > 0
-      ? `<span class="cat-badge" id="badge-${cat.id}" style="display:inline-block;background:${cat.bg};color:${cat.color};border:1px solid ${cat.color}33">
-           ${catDone}/${goals.length}
-         </span>`
-      : `<span class="cat-badge" id="badge-${cat.id}"></span>`;
-
-    // Goals HTML
-    const goalsHTML = goals.map(g => `
-      <div class="goal-item" id="goal-${g.id}">
-        <button class="check-btn ${g.done?'checked':''}"
-          style="border-color:${cat.color};${g.done?`background:${cat.color}`:'background:transparent'}"
-          onclick="toggleGoal('${cat.id}','${g.id}')">
-          ${g.done ? '✓' : ''}
-        </button>
-        <span class="goal-text ${g.done?'done':''}">${escHtml(g.text)}</span>
-        <button class="del-btn" onclick="removeGoal('${cat.id}','${g.id}')">×</button>
-      </div>`).join('');
-
-    // Input row
-    const inputHTML = isOpen ? `
-      <div class="add-row" id="input-row-${cat.id}">
-        <input class="add-input" id="input-${cat.id}"
-          placeholder="New ${cat.label.toLowerCase()} goal…"
-          style="caret-color:${cat.color}"
-          onkeydown="if(event.key==='Enter')addGoal('${cat.id}')"
-        />
-        <button class="confirm-btn"
-          style="background:linear-gradient(135deg,${cat.color},${lighten(cat.color)});box-shadow:0 4px 18px ${cat.glow}"
-          onclick="addGoal('${cat.id}')">Add</button>
-      </div>` : '';
-
-    card.innerHTML = `
-      <div class="cat-header">
-        <div class="cat-left">
-          <span class="cat-emoji">${cat.emoji}</span>
-          <span class="cat-name" style="color:${cat.color}">${cat.label}</span>
-          ${badgeHTML}
+  <!-- HOME VIEW -->
+  <div class="view active" id="view-home">
+    <div class="header">
+      <div class="date-label" id="date-label"></div>
+      <div class="header-row">
+        <div class="logo-row">
+          <div class="logo-wrap">
+            <div class="logo-glow"></div>
+            <svg width="52" height="64" viewBox="0 0 100 124" fill="none" style="position:relative;z-index:1">
+              <defs>
+                <linearGradient id="lg" x1="0" y1="0" x2="100" y2="124" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#E879F9"/>
+                  <stop offset="40%" stop-color="#A78BFA"/>
+                  <stop offset="100%" stop-color="#2DD4BF"/>
+                </linearGradient>
+                <filter id="gf"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <path d="M50 4C50 4 38 22 38 38C38 50 50 56 50 56C50 56 62 50 62 38C62 22 50 4 50 4Z" fill="url(#lg)" opacity=".95" filter="url(#gf)"/>
+              <path d="M50 56C50 56 30 48 22 36C14 24 18 10 18 10C18 10 10 30 16 46C22 60 38 66 50 68Z" fill="url(#lg)" opacity=".85"/>
+              <path d="M50 56C50 56 70 48 78 36C86 24 82 10 82 10C82 10 90 30 84 46C78 60 62 66 50 68Z" fill="url(#lg)" opacity=".85"/>
+              <path d="M50 68C50 68 26 62 14 50C4 40 6 24 6 24C6 24-2 48 8 64C18 78 38 84 50 86Z" fill="url(#lg)" opacity=".7"/>
+              <path d="M50 68C50 68 74 62 86 50C96 40 94 24 94 24C94 24 102 48 92 64C82 78 62 84 50 86Z" fill="url(#lg)" opacity=".7"/>
+              <path d="M50 86C50 86 40 98 42 108C44 116 50 120 50 120C50 120 56 116 58 108C60 98 50 86 50 86Z" fill="url(#lg)" opacity=".6"/>
+              <path d="M50 8C50 8 50 56 50 120" stroke="#08060F" stroke-width="3.5" stroke-linecap="round" opacity=".7"/>
+              <path d="M34 22C38 36 44 50 50 68" stroke="#08060F" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+              <path d="M66 22C62 36 56 50 50 68" stroke="#08060F" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+              <path d="M18 38C28 52 38 66 50 86" stroke="#08060F" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+              <path d="M82 38C72 52 62 66 50 86" stroke="#08060F" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="wordmark">evolve</div>
+            <div class="tagline" id="tagline"></div>
+          </div>
         </div>
-        <button class="add-btn ${isOpen?'open':''}"
-          id="addbtn-${cat.id}"
-          style="background:${cat.bg};color:${cat.color};${isOpen?`box-shadow:0 0 14px ${cat.glow}`:''}"
-          onclick="toggleInput('${cat.id}')">
-          ${isOpen ? '×' : '+'}
-        </button>
+        <div class="streak-badge">
+          <span style="font-size:20px">🔥</span>
+          <span class="streak-num" id="streak-num">0</span>
+          <span class="streak-lbl">streak</span>
+        </div>
       </div>
-      ${goals.length > 0 ? `<div class="goals-list">${goalsHTML}</div>` : ''}
-      ${inputHTML}
-    `;
+    </div>
 
-    container.appendChild(card);
+    <!-- Ring Card -->
+    <div class="ring-card">
+      <div class="ring-card-inner">
+        <div class="ring-wrap">
+          <svg width="124" height="124" style="transform:rotate(-90deg)">
+            <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#FF6B35"/></linearGradient></defs>
+            <circle cx="62" cy="62" r="54" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+            <circle id="ring-progress" cx="62" cy="62" r="54" fill="none" stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 339.3" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ring-pct">0%</div>
+            <div class="ring-lbl">done</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="ring-title">Daily Progress</div>
+          <div class="ring-sub" id="ring-sub">Start checking off your goals!</div>
+          <div class="cat-pills" id="cat-pills"></div>
+        </div>
+      </div>
+    </div>
 
-    if (isOpen) {
-      setTimeout(() => {
-        const inp = document.getElementById('input-' + cat.id);
-        if (inp) inp.focus();
-      }, 40);
-    }
-  });
+    <!-- Category Cards -->
+    <div class="cats" id="cats-list"></div>
+  </div>
 
-  updateProgress();
-}
+  <!-- MONTH VIEW -->
+  <div class="view" id="view-month">
+    <div class="cal-header">
+      <div class="section-super">Monthly View</div>
+      <div class="section-title">Calendar</div>
+      <div class="month-nav">
+        <button class="month-arrow" id="prev-month">‹</button>
+        <span class="month-name" id="month-name"></span>
+        <button class="month-arrow" id="next-month">›</button>
+      </div>
+      <div class="day-labels">
+        <div class="day-label">S</div><div class="day-label">M</div><div class="day-label">T</div>
+        <div class="day-label">W</div><div class="day-label">T</div><div class="day-label">F</div>
+        <div class="day-label">S</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="legend">
+        <span>Less</span>
+        <div class="legend-box" style="background:rgba(167,139,250,0.1)"></div>
+        <div class="legend-box" style="background:rgba(167,139,250,0.3)"></div>
+        <div class="legend-box" style="background:rgba(167,139,250,0.5)"></div>
+        <div class="legend-box" style="background:rgba(167,139,250,0.8)"></div>
+        <div class="legend-box" style="background:rgba(167,139,250,1)"></div>
+        <span>More</span>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+        <div class="stat-num" style="color:#A78BFA" id="month-total">0</div>
+        <div class="stat-lbl">goals this month</div>
+      </div>
+      <div class="stat-box" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+        <div style="font-size:22px" id="best-cat-emoji">—</div>
+        <div style="font-size:12px;font-weight:600;margin-top:2px" id="best-cat-name">None yet</div>
+        <div class="stat-lbl">best category</div>
+      </div>
+    </div>
+    <div class="cat-bars" id="cat-bars"></div>
+  </div>
 
-// ─── ACTIONS ──────────────────────────────────────────────────────────────────
-function toggleInput(catId) {
-  openInput = openInput === catId ? null : catId;
-  render();
-}
+  <!-- STATS VIEW -->
+  <div class="view" id="view-stats">
+    <div class="stats-wrap">
+      <div class="section-super">Your</div>
+      <div class="section-title section-title-green">Stats</div>
+      <div class="streak-big" style="background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.05))">
+        <div class="streak-big-icon">🔥</div>
+        <div class="streak-big-num" id="stats-streak">0</div>
+        <div class="streak-big-lbl">Day Streak</div>
+      </div>
+      <div class="stats-2col">
+        <div class="stats-box" style="background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.2)">
+          <div class="stats-box-num" style="color:#A78BFA" id="stats-total-goals">0</div>
+          <div class="stats-box-lbl">Total Goals</div>
+        </div>
+        <div class="stats-box" style="background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.2)">
+          <div class="stats-box-num" style="color:#34D399" id="stats-today-pct">0%</div>
+          <div class="stats-box-lbl">Today</div>
+        </div>
+      </div>
+      <div id="cat-stat-cards"></div>
+    </div>
+  </div>
 
-function addGoal(catId) {
-  const inp = document.getElementById('input-' + catId);
-  if (!inp) return;
-  const txt = inp.value.trim();
-  if (!txt) { inp.focus(); return; }
-  state[catId].push({ id: uid(), text: txt, done: false });
-  openInput = null;
-  saveState();
-  render();
-}
+  <!-- Bottom Nav -->
+  <div class="nav">
+    <button class="nav-btn active" data-view="home">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">Today</span>
+      <div class="nav-dot" id="dot-home"></div>
+    </button>
+    <button class="nav-btn" data-view="month">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Calendar</span>
+      <div class="nav-dot" id="dot-month" style="display:none"></div>
+    </button>
+    <button class="nav-btn" data-view="stats">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Stats</span>
+      <div class="nav-dot" id="dot-stats" style="display:none"></div>
+    </button>
+  </div>
 
-function toggleGoal(catId, goalId) {
-  const g = state[catId].find(x => x.id === goalId);
-  if (g) g.done = !g.done;
-  saveState();
-  render();
-}
+  <!-- Add Goal Modal -->
+  <div class="modal-bg" id="modal">
+    <div class="modal-sheet">
+      <div class="modal-cat-row">
+        <span class="modal-cat-emoji" id="modal-emoji"></span>
+        <div>
+          <div class="modal-label">Add to</div>
+          <div class="modal-cat-name" id="modal-cat-name"></div>
+        </div>
+      </div>
+      <input class="modal-input" id="modal-input" placeholder="e.g. 30 min workout, Read 10 pages..." />
+      <button class="modal-add-btn" id="modal-add-btn">Add Goal ✓</button>
+    </div>
+  </div>
+</div>
 
-function removeGoal(catId, goalId) {
-  state[catId] = state[catId].filter(x => x.id !== goalId);
-  saveState();
-  render();
-}
-
-function resetApp() {
-  if (!confirm('Factory reset? All your goals will be permanently deleted.')) return;
-  state = { fitness:[], mental:[], social:[], skills:[] };
-  openInput = null;
-  saveState();
-  render();
-}
-
-// ─── UTILS ────────────────────────────────────────────────────────────────────
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function lighten(hex) {
-  // Just returns white-ish for gradient stops
-  const map = { '#ff6b6b':'#ffadad', '#b06bff':'#d4a1ff', '#ffd166':'#ffe8a3', '#06d6a0':'#7fffdc' };
-  return map[hex] || hex;
-}
-
-// ─── DATE ─────────────────────────────────────────────────────────────────────
-function setDate() {
-  const d = new Date();
-  document.getElementById('header-date').textContent =
-    d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
-}
-
-// ─── PWA INSTALL ──────────────────────────────────────────────────────────────
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const bar = document.getElementById('install-bar');
-  bar.classList.add('visible');
-});
-document.getElementById('install-ok').addEventListener('click', () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => {
-      deferredPrompt = null;
-      document.getElementById('install-bar').classList.remove('visible');
-    });
-  }
-});
-document.getElementById('install-dismiss').addEventListener('click', () => {
-  document.getElementById('install-bar').classList.remove('visible');
-});
-
-// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+<!-- Link to your new JS file -->
+<script src="script.js"></script>
+  <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
@@ -627,11 +192,6 @@ if ('serviceWorker' in navigator) {
       .catch(e => console.log('SW failed:', e));
   });
 }
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-loadState();
-setDate();
-render();
 </script>
 </body>
 </html>
