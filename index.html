@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolve - Self Growth App</title>
+    <style>
+        /* --- THEME COLORS (LIGHT MODE DEFAULT) --- */
+        :root {
+            --primary-color: #4F46E5;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --btn-hover: #E5E7EB;
+            --delete-hover: #EF4444;
+            
+            --fitness-color: #EF4444;
+            --mental-color: #10B981;
+            --social-color: #F59E0B;
+            --skills-color: #3B82F6;
+        }
+
+        /* --- DARK MODE COLORS --- */
+        [data-theme="dark"] {
+            --bg-color: #111827;      
+            --card-bg: #1F2937;       
+            --text-main: #F9FAFB;     
+            --text-muted: #9CA3AF;    
+            --btn-hover: #374151;     
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative; 
+        }
+
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        header p { font-size: 0.9rem; opacity: 0.9; }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .progress-wrapper {
+            width: 100%;
+            max-width: 800px;
+            padding: 1.5rem 1rem 0 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background-color: var(--card-bg); 
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid var(--text-muted); 
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--mental-color);
+            width: 0%;
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 1.5rem 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--bg-color);
+        }
+
+        .card-title { font-size: 1.25rem; font-weight: 600; }
+
+        .task-list { list-style: none; }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        .task-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            /* Ensures long text doesn't push the delete button off screen */
+            word-break: break-word; 
+            padding-right: 10px;
+        }
+
+        .task-item input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* --- NEW: Delete Button Styling --- */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.2s, color 0.2s;
+            margin-left: auto; /* Pushes the button to the far right */
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            color: var(--delete-hover);
+        }
+
+        .fitness .card-header { border-bottom-color: var(--fitness-color); color: var(--fitness-color); }
+        .mental .card-header { border-bottom-color: var(--mental-color); color: var(--mental-color); }
+        .social .card-header { border-bottom-color: var(--social-color); color: var(--social-color); }
+        .skills .card-header { border-bottom-color: var(--skills-color); color: var(--skills-color); }
+
+        .add-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-color);
+            color: var(--text-muted);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: var(--btn-hover);
+            color: var(--text-main);
+        }
+        
+        .reset-btn {
+            margin: 1rem 0 3rem 0;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { background: #fca5a5; color: white; border-color: #fca5a5; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Evolve Tracker</h1>
+        <p>1% Better Every Day</p>
+        <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+    </header>
+
+    <div class="progress-wrapper">
+        <div class="progress-header">
+            <span>Daily Progress</span>
+            <span id="progress-text">0%</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card fitness">
+            <div class="card-header"><span class="card-title">💪 Fitness</span></div>
+            <ul class="task-list" id="fitness-list"></ul>
+            <button class="add-btn" onclick="addTask('fitness-list')">+ Add Fitness Goal</button>
+        </div>
+
+        <div class="card mental">
+            <div class="card-header"><span class="card-title">🧠 Mental Growth</span></div>
+            <ul class="task-list" id="mental-list"></ul>
+            <button class="add-btn" onclick="addTask('mental-list')">+ Add Mental Goal</button>
+        </div>
+
+        <div class="card social">
+            <div class="card-header"><span class="card-title">🤝 Social Growth</span></div>
+            <ul class="task-list" id="social-list"></ul>
+            <button class="add-btn" onclick="addTask('social-list')">+ Add Social Goal</button>
+        </div>
+
+        <div class="card skills">
+            <div class="card-header"><span class="card-title">🚀 Skills</span></div>
+            <ul class="task-list" id="skills-list"></ul>
+            <button class="add-btn" onclick="addTask('skills-list')">+ Add Skill Goal</button>
+        </div>
+    </div>
+    
+    <button class="reset-btn" onclick="resetData()">Factory Reset App</button>
+
+    <script>
+        // --- Theme Management ---
+        const themeBtn = document.getElementById('theme-btn');
+        const savedTheme = localStorage.getItem('evolveTheme');
+        
+        if (savedTheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            themeBtn.innerText = '☀️'; 
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                localStorage.setItem('evolveTheme', 'light');
+                themeBtn.innerText = '🌙';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('evolveTheme', 'dark');
+                themeBtn.innerText = '☀️';
+            }
+        }
+
+        // --- Data & Initialization ---
+        const defaultData = {
+            'fitness-list': [
+                { id: 'f1', text: 'Drink 3 Liters of Water', checked: false },
+                { id: 'f2', text: '30 Min Workout / Cardio', checked: false },
+                { id: 'f3', text: 'Hit 10,000 Steps', checked: false }
+            ],
+            'mental-list': [
+                { id: 'm1', text: 'Meditate for 10 minutes', checked: false },
+                { id: 'm2', text: 'Read 10 pages of a book', checked: false },
+                { id: 'm3', text: 'Journal thoughts & gratitude', checked: false }
+            ],
+            'social-list': [
+                { id: 's1', text: 'Check in with a friend/family member', checked: false },
+                { id: 's2', text: 'Give one genuine compliment', checked: false },
+                { id: 's3', text: 'Attend a networking or community event', checked: false }
+            ],
+            'skills-list': [
+                { id: 'sk1', text: 'Practice coding for 1 hour', checked: false },
+                { id: 'sk2', text: 'Learn 5 new words in a foreign language', checked: false },
+                { id: 'sk3', text: 'Watch an educational tutorial', checked: false }
+            ]
+        };
+
+        let appData = JSON.parse(localStorage.getItem('evolveData')) || defaultData;
+
+        // --- Daily Reset Logic ---
+        function checkDailyReset() {
+            const today = new Date().toLocaleDateString(); 
+            const lastDate = localStorage.getItem('evolveLastDate');
+
+            if (lastDate !== today) {
+                if (lastDate !== null) { 
+                    for (const listId in appData) {
+                        appData[listId].forEach(task => {
+                            task.checked = false; 
+                        });
+                    }
+                    saveData(); 
+                }
+                localStorage.setItem('evolveLastDate', today);
+            }
+        }
+
+        function updateProgress() {
+            let totalTasks = 0;
+            let completedTasks = 0;
+
+            for (const listId in appData) {
+                appData[listId].forEach(task => {
+                    totalTasks++;
+                    if (task.checked) completedTasks++;
+                });
+            }
+
+            const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').innerText = percentage + '%';
+            
+            if (percentage === 100 && totalTasks > 0) {
+                document.getElementById('progress-text').innerText = '100% - Day Won! 🎉';
+            }
+        }
+
+        function renderLists() {
+            for (const listId in appData) {
+                const listElement = document.getElementById(listId);
+                listElement.innerHTML = ''; 
+                
+                appData[listId].forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = 'task-item';
+                    
+                    // NEW: Added the delete button to the HTML generation
+                    li.innerHTML = `
+                        <input type="checkbox" id="${task.id}" ${task.checked ? 'checked' : ''} onchange="toggleTask('${listId}', '${task.id}')">
+                        <label for="${task.id}">${task.text}</label>
+                        <button class="delete-btn" onclick="deleteTask('${listId}', '${task.id}')" title="Delete Goal">✕</button>
+                    `;
+                    listElement.appendChild(li);
+                });
+            }
+            updateProgress();
+        }
+
+        function saveData() {
+            localStorage.setItem('evolveData', JSON.stringify(appData));
+        }
+
+        function toggleTask(listId, taskId) {
+            const task = appData[listId].find(t => t.id === taskId);
+            if (task) {
+                task.checked = !task.checked; 
+                saveData(); 
+                updateProgress(); 
+            }
+        }
+
+        function addTask(listId) {
+            const taskText = prompt("Enter your new goal:");
+            if (taskText && taskText.trim() !== "") {
+                const uniqueId = 'task-' + Math.random().toString(36).substr(2, 9);
+                
+                appData[listId].push({
+                    id: uniqueId,
+                    text: taskText.trim(),
+                    checked: false
+                });
+                
+                saveData(); 
+                renderLists(); 
+            }
+        }
+
+        // --- NEW: Delete Task Function ---
+        function deleteTask(listId, taskId) {
+            if (confirm("Are you sure you want to delete this goal?")) {
+                // Filter out the task that matches the ID we want to delete
+                appData[listId] = appData[listId].filter(task => task.id !== taskId);
+                
+                saveData(); // Save the new array to local storage
+                renderLists(); // Redraw the screen
+            }
+        }
+
+        function resetData() {
+            if(confirm("Are you sure you want to delete all custom tasks and progress? This will factory reset the app.")) {
+                localStorage.removeItem('evolveData');
+                localStorage.removeItem('evolveLastDate'); 
+                appData = JSON.parse(JSON.stringify(defaultData)); 
+                renderLists();
+            }
+        }
+
+        // --- Run on Load ---
+        checkDailyReset(); 
+        renderLists();     
+    </script>
+</body>
+</html>
