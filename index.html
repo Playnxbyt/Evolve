@@ -1,446 +1,637 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json
-    <title>Evolve - Self Growth App</title>
-    <style>
-        /* --- THEME COLORS (LIGHT MODE DEFAULT) --- */
-        :root {
-            --primary-color: #4F46E5;
-            --bg-color: #F3F4F6;
-            --card-bg: #FFFFFF;
-            --text-main: #1F2937;
-            --text-muted: #6B7280;
-            --btn-hover: #E5E7EB;
-            --delete-hover: #EF4444;
-            
-            --fitness-color: #EF4444;
-            --mental-color: #10B981;
-            --social-color: #F59E0B;
-            --skills-color: #3B82F6;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#080b14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Evolve" />
+  <meta name="description" content="1% Better Every Day — your personal growth tracker" />
+  <title>Evolve Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/080b14/06d6a0?text=E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
 
-        /* --- DARK MODE COLORS --- */
-        [data-theme="dark"] {
-            --bg-color: #111827;      
-            --card-bg: #1F2937;       
-            --text-main: #F9FAFB;     
-            --text-muted: #9CA3AF;    
-            --btn-hover: #374151;     
-        }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+    :root {
+      --bg:        #080b14;
+      --surface:   rgba(255,255,255,0.03);
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8eaf0;
+      --muted:     rgba(255,255,255,0.35);
+      --subtle:    rgba(255,255,255,0.05);
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+      --fit-c:   #ff6b6b; --fit-g: rgba(255,107,107,0.25); --fit-bg: rgba(255,107,107,0.07);
+      --men-c:   #b06bff; --men-g: rgba(176,107,255,0.25); --men-bg: rgba(176,107,255,0.07);
+      --soc-c:   #ffd166; --soc-g: rgba(255,209,102,0.25); --soc-bg: rgba(255,209,102,0.07);
+      --ski-c:   #06d6a0; --ski-g: rgba(6,214,160,0.25);   --ski-bg: rgba(6,214,160,0.07);
+    }
 
-        header {
-            width: 100%;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative; 
-        }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
-        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        header p { font-size: 0.9rem; opacity: 0.9; }
+    /* ── BACKGROUND ATMOSPHERE ── */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(176,107,255,.14) 0%, transparent 70%);
+      top: -120px; right: -100px;
+    }
+    body::after {
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(6,214,160,.1) 0%, transparent 70%);
+      bottom: 80px; left: -80px;
+    }
 
-        .theme-toggle {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: white;
-            opacity: 0.8;
-            transition: opacity 0.2s, transform 0.2s;
-        }
-        
-        .theme-toggle:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
+    /* ── LAYOUT ── */
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 0 0 80px;
+      position: relative;
+      z-index: 1;
+    }
 
-        .progress-wrapper {
-            width: 100%;
-            max-width: 800px;
-            padding: 1.5rem 1rem 0 1rem;
-        }
+    /* ── HEADER ── */
+    .header {
+      padding: 56px 24px 20px;
+    }
+    .header-date {
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .header-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.05;
+      background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,.5));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-sub {
+      margin-top: 5px;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: .04em;
+    }
 
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
+    /* ── PROGRESS CARD ── */
+    .progress-card {
+      margin: 0 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .ring-wrap { position: relative; flex-shrink: 0; width: 120px; height: 120px; }
+    #progress-svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+    .ring-track {
+      fill: none;
+      stroke: rgba(255,255,255,.06);
+      stroke-width: 9;
+    }
+    .ring-fill {
+      fill: none;
+      stroke: url(#ringGrad);
+      stroke-width: 9;
+      stroke-linecap: round;
+      transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);
+    }
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #pct-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #06d6a0, #b06bff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .pct-label { font-size: 10px; color: var(--muted); letter-spacing: .08em; margin-top: 2px; }
+    .progress-info { flex: 1; min-width: 0; }
+    .progress-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    #progress-msg { font-size: 12.5px; color: rgba(255,255,255,.4); line-height: 1.5; }
+    .progress-count { margin-top: 10px; font-size: 13px; color: rgba(255,255,255,.4); }
+    #done-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: #06d6a0; }
+    #total-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
 
-        .progress-container {
-            width: 100%;
-            height: 12px;
-            background-color: var(--card-bg); 
-            border-radius: 999px;
-            overflow: hidden;
-            border: 1px solid var(--text-muted); 
-        }
+    /* ── CATEGORY CARDS ── */
+    .cat-card {
+      margin: 0 14px 13px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 22px;
+      overflow: hidden;
+      transition: transform .15s;
+    }
+    .cat-card:active { transform: scale(.99); }
 
-        .progress-bar {
-            height: 100%;
-            background-color: var(--mental-color);
-            width: 0%;
-            border-radius: 999px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .cat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px 14px;
+    }
+    .cat-left { display: flex; align-items: center; gap: 10px; }
+    .cat-emoji { font-size: 20px; line-height: 1; }
+    .cat-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 15.5px;
+      font-weight: 700;
+    }
+    .cat-badge {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-weight: 600;
+      display: none;
+    }
+    .add-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      font-weight: 300;
+      line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .2s, box-shadow .2s;
+      flex-shrink: 0;
+      color: inherit;
+    }
+    .add-btn:hover { transform: scale(1.1); }
+    .add-btn:active { transform: scale(.93); }
+    .add-btn.open { font-size: 26px; }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            padding: 1.5rem 1rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
+    /* ── GOALS LIST ── */
+    .goals-list { padding: 0 20px 4px; }
+    .goal-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,.05);
+      animation: slideIn .22s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .check-btn {
+      width: 23px; height: 23px;
+      border-radius: 50%;
+      border: 2px solid;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all .2s;
+      background: transparent;
+      color: transparent;
+    }
+    .check-btn.checked { color: #080b14; }
+    .goal-text {
+      flex: 1;
+      font-size: 13.5px;
+      line-height: 1.4;
+      transition: opacity .2s;
+      word-break: break-word;
+    }
+    .goal-text.done {
+      text-decoration: line-through;
+      opacity: .35;
+    }
+    .del-btn {
+      width: 27px; height: 27px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.3);
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .del-btn:hover { background: rgba(255,80,80,.14); color: #ff6b6b; }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+    /* ── ADD INPUT ROW ── */
+    .add-row {
+      display: flex;
+      gap: 8px;
+      padding: 8px 18px 16px;
+      animation: slideIn .2s ease;
+    }
+    .add-input {
+      flex: 1;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 13px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .add-input::placeholder { color: rgba(255,255,255,.22); }
+    .add-input:focus { border-color: rgba(255,255,255,.24); }
+    .confirm-btn {
+      padding: 10px 18px;
+      border-radius: 13px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #080b14;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .confirm-btn:hover { transform: scale(1.04); }
+    .confirm-btn:active { transform: scale(.96); }
 
-        .card:hover { transform: translateY(-5px); }
+    /* ── RESET ── */
+    .reset-wrap { text-align: center; margin-top: 26px; }
+    .reset-btn {
+      background: transparent;
+      border: 1px solid rgba(255,80,80,.22);
+      border-radius: 14px;
+      color: rgba(255,107,107,.55);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      letter-spacing: .04em;
+      padding: 11px 26px;
+      transition: all .2s;
+    }
+    .reset-btn:hover { background: rgba(255,80,80,.08); color: #ff6b6b; border-color: rgba(255,107,107,.5); }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--bg-color);
-        }
-
-        .card-title { font-size: 1.25rem; font-weight: 600; }
-
-        .task-list { list-style: none; }
-
-        .task-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.8rem;
-            font-size: 0.95rem;
-        }
-
-        .task-item input[type="checkbox"] {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--primary-color);
-        }
-
-        .task-item label {
-            cursor: pointer;
-            flex-grow: 1;
-            /* Ensures long text doesn't push the delete button off screen */
-            word-break: break-word; 
-            padding-right: 10px;
-        }
-
-        .task-item input[type="checkbox"]:checked + label {
-            text-decoration: line-through;
-            color: var(--text-muted);
-        }
-
-        /* --- NEW: Delete Button Styling --- */
-        .delete-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            cursor: pointer;
-            opacity: 0.4;
-            transition: opacity 0.2s, color 0.2s;
-            margin-left: auto; /* Pushes the button to the far right */
-        }
-
-        .delete-btn:hover {
-            opacity: 1;
-            color: var(--delete-hover);
-        }
-
-        .fitness .card-header { border-bottom-color: var(--fitness-color); color: var(--fitness-color); }
-        .mental .card-header { border-bottom-color: var(--mental-color); color: var(--mental-color); }
-        .social .card-header { border-bottom-color: var(--social-color); color: var(--social-color); }
-        .skills .card-header { border-bottom-color: var(--skills-color); color: var(--skills-color); }
-
-        .add-btn {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            background-color: var(--bg-color);
-            color: var(--text-muted);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            width: 100%;
-            transition: all 0.2s;
-        }
-
-        .add-btn:hover {
-            background-color: var(--btn-hover);
-            color: var(--text-main);
-        }
-        
-        .reset-btn {
-            margin: 1rem 0 3rem 0;
-            padding: 0.5rem 1rem;
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--text-muted);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .reset-btn:hover { background: #fca5a5; color: white; border-color: #fca5a5; }
-
-    </style>
+    /* ── PWA INSTALL BANNER ── */
+    #install-bar {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20,22,32,.95);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 12px 18px;
+      font-size: 13px;
+      color: var(--text);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      gap: 14px;
+      align-items: center;
+      max-width: 360px;
+      width: calc(100% - 32px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      animation: slideIn .3s ease;
+    }
+    #install-bar.visible { display: flex; }
+    #install-bar span { flex: 1; line-height: 1.4; }
+    #install-bar strong { font-family: 'Syne', sans-serif; color: #06d6a0; }
+    #install-ok {
+      background: linear-gradient(135deg, #06d6a0, #b06bff);
+      color: #080b14;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform .2s;
+    }
+    #install-ok:hover { transform: scale(1.05); }
+    #install-dismiss {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 18px; line-height: 1; padding: 4px;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>Evolve Tracker</h1>
-        <p>1% Better Every Day</p>
-        <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
-    </header>
+<div id="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-date" id="header-date"></div>
+    <div class="header-title">Evolve<br>Tracker</div>
+    <div class="header-sub">1% Better Every Day</div>
+  </div>
 
-    <div class="progress-wrapper">
-        <div class="progress-header">
-            <span>Daily Progress</span>
-            <span id="progress-text">0%</span>
-        </div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
+  <!-- PROGRESS CARD -->
+  <div class="progress-card">
+    <div class="ring-wrap">
+      <svg id="progress-svg" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#06d6a0"/>
+            <stop offset="100%" stop-color="#b06bff"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="60" cy="60" r="50"/>
+        <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50"
+          stroke-dasharray="314.16"
+          stroke-dashoffset="314.16"/>
+      </svg>
+      <div class="ring-center">
+        <span id="pct-num">0%</span>
+        <span class="pct-label">done</span>
+      </div>
     </div>
-
-    <div class="container">
-        <div class="card fitness">
-            <div class="card-header"><span class="card-title">💪 Fitness</span></div>
-            <ul class="task-list" id="fitness-list"></ul>
-            <button class="add-btn" onclick="addTask('fitness-list')">+ Add Fitness Goal</button>
-        </div>
-
-        <div class="card mental">
-            <div class="card-header"><span class="card-title">🧠 Mental Growth</span></div>
-            <ul class="task-list" id="mental-list"></ul>
-            <button class="add-btn" onclick="addTask('mental-list')">+ Add Mental Goal</button>
-        </div>
-
-        <div class="card social">
-            <div class="card-header"><span class="card-title">🤝 Social Growth</span></div>
-            <ul class="task-list" id="social-list"></ul>
-            <button class="add-btn" onclick="addTask('social-list')">+ Add Social Goal</button>
-        </div>
-
-        <div class="card skills">
-            <div class="card-header"><span class="card-title">🚀 Skills</span></div>
-            <ul class="task-list" id="skills-list"></ul>
-            <button class="add-btn" onclick="addTask('skills-list')">+ Add Skill Goal</button>
-        </div>
+    <div class="progress-info">
+      <div class="progress-title">Daily Progress</div>
+      <div id="progress-msg">Start checking off your goals!</div>
+      <div class="progress-count">
+        <span id="done-num">0</span>
+        <span id="total-num"> / 0</span>
+        <span style="color:rgba(255,255,255,.35)"> goals</span>
+      </div>
     </div>
-    
-    <button class="reset-btn" onclick="resetData()">Factory Reset App</button>
+  </div>
 
-    <script>
-        // --- Theme Management ---
-        const themeBtn = document.getElementById('theme-btn');
-        const savedTheme = localStorage.getItem('evolveTheme');
-        
-        if (savedTheme === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-            themeBtn.innerText = '☀️'; 
-        }
+  <!-- CATEGORY CARDS (rendered by JS) -->
+  <div id="cats"></div>
 
-        function toggleTheme() {
-            const body = document.body;
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                localStorage.setItem('evolveTheme', 'light');
-                themeBtn.innerText = '🌙';
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('evolveTheme', 'dark');
-                themeBtn.innerText = '☀️';
-            }
-        }
+  <div class="reset-wrap">
+    <button class="reset-btn" onclick="resetApp()">⚠ Factory Reset</button>
+  </div>
+</div>
 
-        // --- Data & Initialization ---
-        const defaultData = {
-            'fitness-list': [
-                { id: 'f1', text: 'Drink 3 Liters of Water', checked: false },
-                { id: 'f2', text: '30 Min Workout / Cardio', checked: false },
-                { id: 'f3', text: 'Hit 10,000 Steps', checked: false }
-            ],
-            'mental-list': [
-                { id: 'm1', text: 'Meditate for 10 minutes', checked: false },
-                { id: 'm2', text: 'Read 10 pages of a book', checked: false },
-                { id: 'm3', text: 'Journal thoughts & gratitude', checked: false }
-            ],
-            'social-list': [
-                { id: 's1', text: 'Check in with a friend/family member', checked: false },
-                { id: 's2', text: 'Give one genuine compliment', checked: false },
-                { id: 's3', text: 'Attend a networking or community event', checked: false }
-            ],
-            'skills-list': [
-                { id: 'sk1', text: 'Practice coding for 1 hour', checked: false },
-                { id: 'sk2', text: 'Learn 5 new words in a foreign language', checked: false },
-                { id: 'sk3', text: 'Watch an educational tutorial', checked: false }
-            ]
-        };
+<!-- PWA INSTALL BANNER -->
+<div id="install-bar">
+  <span>Add <strong>Evolve</strong> to your home screen for the best experience!</span>
+  <button id="install-ok">Install</button>
+  <button id="install-dismiss">×</button>
+</div>
 
-        let appData = JSON.parse(localStorage.getItem('evolveData')) || defaultData;
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+const CATS = [
+  { id:'fitness', label:'Fitness',       emoji:'💪', color:'#ff6b6b', glow:'rgba(255,107,107,.28)', bg:'rgba(255,107,107,.07)' },
+  { id:'mental',  label:'Mental Growth', emoji:'🧠', color:'#b06bff', glow:'rgba(176,107,255,.28)', bg:'rgba(176,107,255,.07)' },
+  { id:'social',  label:'Social Growth', emoji:'🤝', color:'#ffd166', glow:'rgba(255,209,102,.28)', bg:'rgba(255,209,102,.07)' },
+  { id:'skills',  label:'Skills',        emoji:'🚀', color:'#06d6a0', glow:'rgba(6,214,160,.28)',   bg:'rgba(6,214,160,.07)'   },
+];
 
-        // --- Daily Reset Logic ---
-        function checkDailyReset() {
-            const today = new Date().toLocaleDateString(); 
-            const lastDate = localStorage.getItem('evolveLastDate');
+let state = { fitness:[], mental:[], social:[], skills:[] };
+let openInput = null; // which cat has input open
 
-            if (lastDate !== today) {
-                if (lastDate !== null) { 
-                    for (const listId in appData) {
-                        appData[listId].forEach(task => {
-                            task.checked = false; 
-                        });
-                    }
-                    saveData(); 
-                }
-                localStorage.setItem('evolveLastDate', today);
-            }
-        }
+function loadState() {
+  try {
+    const raw = localStorage.getItem('evolve_goals_v2');
+    if (raw) state = JSON.parse(raw);
+  } catch(_) {}
+}
+function saveState() {
+  try { localStorage.setItem('evolve_goals_v2', JSON.stringify(state)); } catch(_) {}
+}
 
-        function updateProgress() {
-            let totalTasks = 0;
-            let completedTasks = 0;
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-            for (const listId in appData) {
-                appData[listId].forEach(task => {
-                    totalTasks++;
-                    if (task.checked) completedTasks++;
-                });
-            }
+function allGoals() { return Object.values(state).flat(); }
+function doneGoals() { return allGoals().filter(g => g.done); }
 
-            const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+// ─── PROGRESS ─────────────────────────────────────────────────────────────────
+function updateProgress() {
+  const total = allGoals().length;
+  const done  = doneGoals().length;
+  const pct   = total === 0 ? 0 : Math.round((done / total) * 100);
+  const circ  = 2 * Math.PI * 50; // 314.16
 
-            document.getElementById('progress-bar').style.width = percentage + '%';
-            document.getElementById('progress-text').innerText = percentage + '%';
-            
-            if (percentage === 100 && totalTasks > 0) {
-                document.getElementById('progress-text').innerText = '100% - Day Won! 🎉';
-            }
-        }
+  document.getElementById('pct-num').textContent  = pct + '%';
+  document.getElementById('done-num').textContent = done;
+  document.getElementById('total-num').textContent = ' / ' + total;
 
-        function renderLists() {
-            for (const listId in appData) {
-                const listElement = document.getElementById(listId);
-                listElement.innerHTML = ''; 
-                
-                appData[listId].forEach(task => {
-                    const li = document.createElement('li');
-                    li.className = 'task-item';
-                    
-                    // NEW: Added the delete button to the HTML generation
-                    li.innerHTML = `
-                        <input type="checkbox" id="${task.id}" ${task.checked ? 'checked' : ''} onchange="toggleTask('${listId}', '${task.id}')">
-                        <label for="${task.id}">${task.text}</label>
-                        <button class="delete-btn" onclick="deleteTask('${listId}', '${task.id}')" title="Delete Goal">✕</button>
-                    `;
-                    listElement.appendChild(li);
-                });
-            }
-            updateProgress();
-        }
+  const fill   = document.getElementById('ring-fill');
+  const offset = circ - (pct / 100) * circ;
+  fill.style.strokeDashoffset = offset;
 
-        function saveData() {
-            localStorage.setItem('evolveData', JSON.stringify(appData));
-        }
+  const msgs = [
+    'Start checking off your goals!',
+    "You've started — keep going!",
+    "Nice momentum, keep it up 💪",
+    "Halfway there, don't stop now!",
+    "So close! Finish strong 🔥",
+    "You crushed it today! 🏆"
+  ];
+  const idx = pct === 0 ? 0 : pct === 100 ? 5 : Math.min(4, Math.floor(pct / 25) + 1);
+  document.getElementById('progress-msg').textContent = msgs[idx];
+}
 
-        function toggleTask(listId, taskId) {
-            const task = appData[listId].find(t => t.id === taskId);
-            if (task) {
-                task.checked = !task.checked; 
-                saveData(); 
-                updateProgress(); 
-            }
-        }
+// ─── RENDER CATEGORIES ────────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('cats');
+  container.innerHTML = '';
 
-        function addTask(listId) {
-            const taskText = prompt("Enter your new goal:");
-            if (taskText && taskText.trim() !== "") {
-                const uniqueId = 'task-' + Math.random().toString(36).substr(2, 9);
-                
-                appData[listId].push({
-                    id: uniqueId,
-                    text: taskText.trim(),
-                    checked: false
-                });
-                
-                saveData(); 
-                renderLists(); 
-            }
-        }
+  CATS.forEach(cat => {
+    const goals    = state[cat.id] || [];
+    const catDone  = goals.filter(g => g.done).length;
+    const isOpen   = openInput === cat.id;
 
-        // --- NEW: Delete Task Function ---
-        function deleteTask(listId, taskId) {
-            if (confirm("Are you sure you want to delete this goal?")) {
-                // Filter out the task that matches the ID we want to delete
-                appData[listId] = appData[listId].filter(task => task.id !== taskId);
-                
-                saveData(); // Save the new array to local storage
-                renderLists(); // Redraw the screen
-            }
-        }
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.id = 'cat-' + cat.id;
+    card.style.background = cat.bg;
 
-        function resetData() {
-            if(confirm("Are you sure you want to delete all custom tasks and progress? This will factory reset the app.")) {
-                localStorage.removeItem('evolveData');
-                localStorage.removeItem('evolveLastDate'); 
-                appData = JSON.parse(JSON.stringify(defaultData)); 
-                renderLists();
-            }
-        }
+    // Badge
+    const badgeHTML = goals.length > 0
+      ? `<span class="cat-badge" id="badge-${cat.id}" style="display:inline-block;background:${cat.bg};color:${cat.color};border:1px solid ${cat.color}33">
+           ${catDone}/${goals.length}
+         </span>`
+      : `<span class="cat-badge" id="badge-${cat.id}"></span>`;
 
-        // --- Run on Load ---
-        checkDailyReset(); 
-        renderLists();     
-    </script>
+    // Goals HTML
+    const goalsHTML = goals.map(g => `
+      <div class="goal-item" id="goal-${g.id}">
+        <button class="check-btn ${g.done?'checked':''}"
+          style="border-color:${cat.color};${g.done?`background:${cat.color}`:'background:transparent'}"
+          onclick="toggleGoal('${cat.id}','${g.id}')">
+          ${g.done ? '✓' : ''}
+        </button>
+        <span class="goal-text ${g.done?'done':''}">${escHtml(g.text)}</span>
+        <button class="del-btn" onclick="removeGoal('${cat.id}','${g.id}')">×</button>
+      </div>`).join('');
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log('SW registered'))
-          .catch(err => console.log('SW error:', err));
-      }
-    </script>
+    // Input row
+    const inputHTML = isOpen ? `
+      <div class="add-row" id="input-row-${cat.id}">
+        <input class="add-input" id="input-${cat.id}"
+          placeholder="New ${cat.label.toLowerCase()} goal…"
+          style="caret-color:${cat.color}"
+          onkeydown="if(event.key==='Enter')addGoal('${cat.id}')"
+        />
+        <button class="confirm-btn"
+          style="background:linear-gradient(135deg,${cat.color},${lighten(cat.color)});box-shadow:0 4px 18px ${cat.glow}"
+          onclick="addGoal('${cat.id}')">Add</button>
+      </div>` : '';
 
+    card.innerHTML = `
+      <div class="cat-header">
+        <div class="cat-left">
+          <span class="cat-emoji">${cat.emoji}</span>
+          <span class="cat-name" style="color:${cat.color}">${cat.label}</span>
+          ${badgeHTML}
+        </div>
+        <button class="add-btn ${isOpen?'open':''}"
+          id="addbtn-${cat.id}"
+          style="background:${cat.bg};color:${cat.color};${isOpen?`box-shadow:0 0 14px ${cat.glow}`:''}"
+          onclick="toggleInput('${cat.id}')">
+          ${isOpen ? '×' : '+'}
+        </button>
+      </div>
+      ${goals.length > 0 ? `<div class="goals-list">${goalsHTML}</div>` : ''}
+      ${inputHTML}
+    `;
+
+    container.appendChild(card);
+
+    if (isOpen) {
+      setTimeout(() => {
+        const inp = document.getElementById('input-' + cat.id);
+        if (inp) inp.focus();
+      }, 40);
+    }
+  });
+
+  updateProgress();
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────────────────
+function toggleInput(catId) {
+  openInput = openInput === catId ? null : catId;
+  render();
+}
+
+function addGoal(catId) {
+  const inp = document.getElementById('input-' + catId);
+  if (!inp) return;
+  const txt = inp.value.trim();
+  if (!txt) { inp.focus(); return; }
+  state[catId].push({ id: uid(), text: txt, done: false });
+  openInput = null;
+  saveState();
+  render();
+}
+
+function toggleGoal(catId, goalId) {
+  const g = state[catId].find(x => x.id === goalId);
+  if (g) g.done = !g.done;
+  saveState();
+  render();
+}
+
+function removeGoal(catId, goalId) {
+  state[catId] = state[catId].filter(x => x.id !== goalId);
+  saveState();
+  render();
+}
+
+function resetApp() {
+  if (!confirm('Factory reset? All your goals will be permanently deleted.')) return;
+  state = { fitness:[], mental:[], social:[], skills:[] };
+  openInput = null;
+  saveState();
+  render();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function lighten(hex) {
+  // Just returns white-ish for gradient stops
+  const map = { '#ff6b6b':'#ffadad', '#b06bff':'#d4a1ff', '#ffd166':'#ffe8a3', '#06d6a0':'#7fffdc' };
+  return map[hex] || hex;
+}
+
+// ─── DATE ─────────────────────────────────────────────────────────────────────
+function setDate() {
+  const d = new Date();
+  document.getElementById('header-date').textContent =
+    d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+}
+
+// ─── PWA INSTALL ──────────────────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const bar = document.getElementById('install-bar');
+  bar.classList.add('visible');
+});
+document.getElementById('install-ok').addEventListener('click', () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('install-bar').classList.remove('visible');
+    });
+  }
+});
+document.getElementById('install-dismiss').addEventListener('click', () => {
+  document.getElementById('install-bar').classList.remove('visible');
+});
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadState();
+setDate();
+render();
+</script>
 </body>
 </html>
