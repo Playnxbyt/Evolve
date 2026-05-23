@@ -2,9 +2,11 @@ const CACHE_NAME = 'evolve-cache-v1';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
+    './script.js',
+    './style.css',
     './manifest.json',
-    './icon-192.png',
-    './icon-512.png'
+    './Icon-192.png',
+    './icon-512.png
 ];
 
 // Install the service worker and cache the files
