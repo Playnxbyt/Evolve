@@ -1,0 +1,22 @@
+{
+  "name": "Evolve",
+  "short_name": "Evolve",
+  "description": "Track your fitness, mental, social, and skill goals.",
+  "start_url": "/Evolve-1/",
+  "scope": "/Evolve-1/",
+  "display": "standalone",
+  "background_color": "#08060F",
+  "theme_color": "#08060F",
+  "icons": [
+    {
+      "src": "Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
